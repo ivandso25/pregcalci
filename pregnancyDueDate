@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Due Date Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f7ff;
+        }
+
+        .calculator-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .results h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .results p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .trimester-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Pregnancy Due Date Calculator</h1>
+        
+        <div class="input-group">
+            <label for="calculation-method">Calculate by:</label>
+            <select id="calculation-method" onchange="toggleDateInput()">
+                <option value="lmp">Last Menstrual Period (LMP)</option>
+                <option value="conception">Conception Date</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label id="date-label" for="input-date">Last Menstrual Period Date:</label>
+            <input type="date" id="input-date" required>
+        </div>
+
+        <button onclick="calculateDueDate()">Calculate Due Date</button>
+
+        <div id="results" class="results">
+            <h2>Your Pregnancy Details</h2>
+            <p><strong>Due Date:</strong> <span id="due-date"></span></p>
+            <p><strong>Current Week:</strong> <span id="current-week"></span></p>
+            
+            <div class="trimester-info">
+                <h3>Trimester Information:</h3>
+                <p><strong>First Trimester:</strong> <span id="first-trimester"></span></p>
+                <p><strong>Second Trimester:</strong> <span id="second-trimester"></span></p>
+                <p><strong>Third Trimester:</strong> <span id="third-trimester"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDateInput() {
+            const method = document.getElementById('calculation-method').value;
+            const dateLabel = document.getElementById('date-label');
+            dateLabel.textContent = method === 'lmp' ? 
+                'Last Menstrual Period Date:' : 'Conception Date:';
+        }
+
+        function calculateDueDate() {
+            const method = document.getElementById('calculation-method').value;
+            const inputDate = new Date(document.getElementById('input-date').value);
+            
+            if (isNaN(inputDate.getTime())) {
+                alert('Please enter a valid date');
+                return;
+            }
+
+            let dueDate = new Date(inputDate);
+            
+            if (method === 'lmp') {
+                // Add 280 days (40 weeks) to LMP
+                dueDate.setDate(dueDate.getDate() + 280);
+            } else {
+                // Add 266 days (38 weeks) to conception date
+                dueDate.setDate(dueDate.getDate() + 266);
+            }
+
+            // Calculate current week
+            const today = new Date();
+            let pregnancyStart = new Date(inputDate);
+            if (method === 'conception') {
+                pregnancyStart.setDate(pregnancyStart.getDate() - 14);
+            }
+            
+            const diffTime = Math.abs(today - pregnancyStart);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const currentWeek = Math.floor(diffDays / 7);
+
+            // Calculate trimester dates
+            let firstTrimesterEnd = new Date(pregnancyStart);
+            firstTrimesterEnd.setDate(firstTrimesterEnd.getDate() + 84);
+
+            let secondTrimesterEnd = new Date(pregnancyStart);
+            secondTrimesterEnd.setDate(secondTrimesterEnd.getDate() + 189);
+
+            // Display results
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('due-date').textContent = dueDate.toLocaleDateString();
+            document.getElementById('current-week').textContent = 
+                `Week ${currentWeek} (${diffDays} days)`;
+
+            document.getElementById('first-trimester').textContent = 
+                `Weeks 1-12 (${pregnancyStart.toLocaleDateString()} to ${firstTrimesterEnd.toLocaleDateString()})`;
+            document.getElementById('second-trimester').textContent = 
+                `Weeks 13-27 (${new Date(firstTrimesterEnd.getTime() + 86400000).toLocaleDateString()} to ${secondTrimesterEnd.toLocaleDateString()})`;
+            document.getElementById('third-trimester').textContent = 
+                `Weeks 28-40 (${new Date(secondTrimesterEnd.getTime() + 86400000).toLocaleDateString()} to ${dueDate.toLocaleDateString()})`;
+        }
+    </script>
+</body>
+</html>
+</qodoArtifact>
+
